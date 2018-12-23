@@ -30,12 +30,16 @@ class Ui_MainWindow(object):
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_2)
         self.signal_a = QtWidgets.QDoubleSpinBox(self.widget_2)
         self.signal_a.setObjectName("signal_a")
+        self.signal_a.setMaximum(200000)
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.signal_a)
         self.label_3 = QtWidgets.QLabel(self.widget_2)
         self.label_3.setObjectName("label_3")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.label_3)
+
+
         self.signal_f = QtWidgets.QDoubleSpinBox(self.widget_2)
         self.signal_f.setObjectName("signal_f")
+        self.signal_f.setMaximum(200000)
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.signal_f)
         self.formLayout_3.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.widget_2)
         self.button_dialog = QtWidgets.QDialogButtonBox(self.centralwidget)

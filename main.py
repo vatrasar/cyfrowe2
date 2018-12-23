@@ -22,8 +22,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
 
 class Gui:
     def __init__(self,window):
-
-
+        self.signal_parts = list()
         amplitude_before,amplitude_after,time,repsonse_fequency,response_gain=self.compute_plots()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(window,amplitude_before,amplitude_after,time,repsonse_fequency,response_gain)
@@ -38,10 +37,23 @@ class Gui:
         nsamples = T * fs
         order=6
         time = np.linspace(0, T, nsamples, endpoint=False)
-        amplitude_before = 0.1 * np.sin(2 * np.pi * 1.2 * np.sqrt(time))
-        amplitude_before += 0.01 * np.cos(2 * np.pi * 312 * time + 0.1)
-        amplitude_before += 0.02 * np.cos(2 * np.pi * 600.0 * time + .11)
-        amplitude_before += 0.03 * np.cos(2 * np.pi * 2000 * time)
+
+        amplitude_before=None
+        if len(self.signal_parts)==0:#default signal
+            amplitude_before = 0.1 * np.sin(2 * np.pi * 1.2 * np.sqrt(time))
+            amplitude_before += 0.01 * np.cos(2 * np.pi * 312 * time + 0.1)
+            amplitude_before += 0.02 * np.cos(2 * np.pi * 600.0 * time + .11)
+            amplitude_before += 0.03 * np.cos(2 * np.pi * 2000 * time)
+        else:
+
+            for index,signal_part in enumerate(self.signal_parts):
+                a = signal_part[0]
+                f = signal_part[1]
+                if index==0:
+
+                    amplitude_before = a * np.sin(2 * np.pi * f* np.sqrt(time))
+                else:
+                    amplitude_before += a* np.sin(2 * np.pi * f * np.sqrt(time))
 
         amplitude_after = butter_bandpass_filter(amplitude_before, lowcut, highcut, fs, order=6)
         b, a = butter_bandpass(lowcut, highcut, fs, order=order)
@@ -51,10 +63,17 @@ class Gui:
 
         return amplitude_before,amplitude_after,time,repsonse_fequency,response_gain
     def accepted_new_signal_part(self):
-        self.ui.signal_parts.append([self.add_signal_ui.signal_a.text(),self.add_signal_ui.signal_f.text()])
+        f=self.add_signal_ui.signal_a.text()
+        a=self.add_signal_ui.signal_f.text()
+        a=a.replace(",",".")
+        b=f.replace(",",".")
+
+        self.signal_parts.append([float(a),float(b)])
+
         self.add_signal_window.close()
         amplitude_before, amplitude_after, time, repsonse_fequency, response_gain=self.compute_plots()
         self.ui.repaint(amplitude_before, amplitude_after, time, repsonse_fequency, response_gain)
+
     def rejected_new_signal_part(self):
         self.add_signal_window.close()
     def add_actions(self):

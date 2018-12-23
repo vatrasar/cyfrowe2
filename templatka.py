@@ -12,7 +12,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow,amplitude_before,amplitude_after,time,repsonse_fequency,response_gain):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(771, 600)
-        self.signal_parts=list()
+
         self.make_plots(amplitude_before,amplitude_after,time,repsonse_fequency,response_gain)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
