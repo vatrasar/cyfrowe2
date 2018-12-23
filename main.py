@@ -6,6 +6,8 @@ from scipy.signal import freqz
 from scipy.signal import butter, lfilter
 import numpy as np
 import addSignalPart
+import new_order
+
 
 def butter_bandpass(lowcut, highcut, fs, order=5):
     nyq = 0.5 * fs
@@ -22,11 +24,13 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
 
 class Gui:
     def __init__(self,window):
+        self.order = 6
         self.signal_parts = list()
         amplitude_before,amplitude_after,time,repsonse_fequency,response_gain=self.compute_plots()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(window,amplitude_before,amplitude_after,time,repsonse_fequency,response_gain)
         self.add_actions()
+
 
     def compute_plots(self):
         # Sample rate and desired cutoff frequencies (in Hz).
@@ -35,7 +39,7 @@ class Gui:
         lowcut = 500.0
         highcut = 1800.0
         nsamples = T * fs
-        order=6
+        order=self.order
         time = np.linspace(0, T, nsamples, endpoint=False)
 
         amplitude_before=None
@@ -79,6 +83,23 @@ class Gui:
     def add_actions(self):
         self.ui.add_signal_part.triggered.connect(self.open_add_signal_window)
         self.ui.default_signal.triggered.connect(self.restore_default_signal)
+        self.ui.actionzmie_order.triggered.connect(self.change_order)
+    def change_order(self):
+        self.change_order_window = QtWidgets.QMainWindow()
+        self.change_order_ui = new_order.Ui_MainWindow()
+        self.change_order_ui.setupUi(self.change_order_window)
+        self.change_order_ui.buttonBox.accepted.connect(self.accepted_new_order)
+        self.change_order_ui.buttonBox.rejected.connect(self.rejected_new_order)
+
+        self.change_order_window.show()
+    def accepted_new_order(self):
+        self.change_order_window.close()
+        new_order=int(self.change_order_ui.new_order_num.text())
+        self.order=new_order
+        amplitude_before, amplitude_after, time, repsonse_fequency, response_gain = self.compute_plots()
+        self.ui.repaint(amplitude_before, amplitude_after, time, repsonse_fequency, response_gain)
+    def rejected_new_order(self):
+        self.add_signal_window.close()
     def open_add_signal_window(self):
         self.add_signal_window=QtWidgets.QMainWindow()
         self.add_signal_ui=addSignalPart.Ui_MainWindow()

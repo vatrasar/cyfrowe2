@@ -66,7 +66,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.menuEdycja.setTitle(_translate("MainWindow", "Edycja"))
         self.menu_sygnal.setTitle(_translate("MainWindow", "Sygnał"))
-        self.actionzmie_order.setText(_translate("MainWindow", "zmień order"))
+        self.actionzmie_order.setText(_translate("MainWindow", "zmień rząd filtru"))
         self.add_signal_part.setText(_translate("MainWindow", "dodaj składową sygnału"))
         self.default_signal.setText(_translate("MainWindow", "sygnał domyślny"))
 
