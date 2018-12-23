@@ -10,9 +10,9 @@ import new_order
 
 
 def butter_bandpass(lowcut, highcut, fs, order=5):
-    nyq = 0.5 * fs
-    low = lowcut / nyq
-    high = highcut / nyq
+    w = 0.5 * fs  # Normalize the frequency
+    low = lowcut / w
+    high = highcut / w
     b, a = butter(order, [low, high], btype='band')
     return b, a
 
@@ -30,6 +30,7 @@ class Gui:
         self.ui = Ui_MainWindow()
         self.ui.setupUi(window,amplitude_before,amplitude_after,time,repsonse_fequency,response_gain)
         self.add_actions()
+        self.filter_type='band' #lowpass', 'highpass', 'bandpass', 'bandstop'
 
 
     def compute_plots(self):

@@ -2,8 +2,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
-import numpy as np
-import addSignalPart
+
 
 class Ui_MainWindow(object):
 
@@ -33,6 +32,7 @@ class Ui_MainWindow(object):
         self.menubar.setObjectName("menubar")
         self.menuEdycja = QtWidgets.QMenu(self.menubar)
         self.menuEdycja.setObjectName("menuEdycja")
+
         self.menu_sygnal = QtWidgets.QMenu(self.menubar)
         self.menu_sygnal.setObjectName("sygnal")
         MainWindow.setMenuBar(self.menubar)
@@ -43,6 +43,10 @@ class Ui_MainWindow(object):
         self.actionzmie_order.setObjectName("actionzmie_order")
         self.default_signal = QtWidgets.QAction(MainWindow)
         self.default_signal.setObjectName("default_signal")
+
+        self.rodzaj_filtru = QtWidgets.QAction(MainWindow)
+        self.default_signal.setObjectName("default_signal")
+
         self.add_signal_part = QtWidgets.QAction(MainWindow)
         self.add_signal_part.setObjectName("signal_part")
         self.menuEdycja.addSeparator()
