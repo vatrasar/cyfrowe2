@@ -33,21 +33,27 @@ class Ui_MainWindow(object):
         self.menubar.setObjectName("menubar")
         self.menuEdycja = QtWidgets.QMenu(self.menubar)
         self.menuEdycja.setObjectName("menuEdycja")
+        self.menu_sygnal = QtWidgets.QMenu(self.menubar)
+        self.menu_sygnal.setObjectName("sygnal")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.actionzmie_order = QtWidgets.QAction(MainWindow)
         self.actionzmie_order.setObjectName("actionzmie_order")
+        self.default_signal = QtWidgets.QAction(MainWindow)
+        self.default_signal.setObjectName("default_signal")
         self.add_signal_part = QtWidgets.QAction(MainWindow)
-        self.add_signal_part.setObjectName("actionzmie_order")
+        self.add_signal_part.setObjectName("signal_part")
         self.menuEdycja.addSeparator()
 
 
 
         self.menuEdycja.addAction(self.actionzmie_order)
-        self.menuEdycja.addAction(self.add_signal_part)
+        self.menu_sygnal.addAction(self.add_signal_part)
+        self.menu_sygnal.addAction(self.default_signal)
         self.menubar.addAction(self.menuEdycja.menuAction())
+        self.menubar.addAction(self.menu_sygnal.menuAction())
 
 
 
@@ -59,8 +65,10 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.menuEdycja.setTitle(_translate("MainWindow", "Edycja"))
+        self.menu_sygnal.setTitle(_translate("MainWindow", "Sygnał"))
         self.actionzmie_order.setText(_translate("MainWindow", "zmień order"))
         self.add_signal_part.setText(_translate("MainWindow", "dodaj składową sygnału"))
+        self.default_signal.setText(_translate("MainWindow", "sygnał domyślny"))
 
 
 

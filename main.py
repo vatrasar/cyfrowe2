@@ -78,6 +78,7 @@ class Gui:
         self.add_signal_window.close()
     def add_actions(self):
         self.ui.add_signal_part.triggered.connect(self.open_add_signal_window)
+        self.ui.default_signal.triggered.connect(self.restore_default_signal)
     def open_add_signal_window(self):
         self.add_signal_window=QtWidgets.QMainWindow()
         self.add_signal_ui=addSignalPart.Ui_MainWindow()
@@ -86,6 +87,11 @@ class Gui:
         self.add_signal_ui.button_dialog.rejected.connect(self.rejected_new_signal_part)
 
         self.add_signal_window.show()
+    def restore_default_signal(self):
+        self.signal_parts.clear()
+        amplitude_before, amplitude_after, time, repsonse_fequency, response_gain = self.compute_plots()
+        self.ui.repaint(amplitude_before, amplitude_after, time, repsonse_fequency, response_gain)
+
 
 
 if __name__ == "__main__":
