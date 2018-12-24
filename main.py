@@ -13,21 +13,59 @@ def butter_bandpass(lowcut, highcut, fs, order=5):
     w = 0.5 * fs  # Normalize the frequency
     low = lowcut / w
     high = highcut / w
-    b, a = butter(order, [low, high], btype='band')
+    b, a = butter(order, [low, high], btype='bandpass')
     return b, a
 
 
-def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
-    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+def butter_lowpass(highcut, fs, order):
+    w = 0.5 * fs  # Normalize the frequency
+
+    high = highcut / w
+    b, a = butter(order, high, btype='lowpass')
+    return b, a
+
+
+def butter_highpass(lowcut, fs, order):
+    w = 0.5 * fs  # Normalize the frequency
+    low = lowcut / w
+    b, a = butter(order, low, btype='highpass')
+    return b, a
+
+
+def butter_bandstop(lowcut, highcut, fs, order):
+    w = 0.5 * fs  # Normalize the frequency
+    low = lowcut / w
+    high = highcut / w
+    b, a = butter(order, [low, high], btype='bandstop')
+    return b, a
+
+
+def butter_filter(data, lowcut, highcut, fs, order=5,filter_type='band'):
+    b, a = get_filter(filter_type, fs, highcut, lowcut, order)
+
     y = lfilter(b, a, data)
     return y
+
+
+def get_filter(filter_type, fs, highcut, lowcut, order):
+    # 'lowpass', 'highpass', 'bandpass', 'bandstop'
+    if filter_type == 'lowpass':
+        b, a = butter_lowpass(highcut, fs, order=order)
+    elif filter_type == 'highpass':
+        b, a = butter_highpass(lowcut, fs, order=order)
+    elif filter_type == 'bandpass':
+        b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+    else:
+        b, a = butter_bandstop(lowcut, highcut, fs, order=order)
+    return b, a
+
 
 class Gui:
     def __init__(self,window):
         self.order = 6
         self.lowcut=500.0
         self.highcut=1800.0
-        self.filter_type = 'band'  # lowpass', 'highpass', 'bandpass', 'bandstop'
+        self.filter_type = 'bandpass'  # lowpass', 'highpass', 'bandpass', 'bandstop'
         self.signal_parts = list()
         amplitude_before,amplitude_after,time,repsonse_fequency,response_gain=self.compute_plots()
         self.ui = Ui_MainWindow()
@@ -62,8 +100,8 @@ class Gui:
                 else:
                     amplitude_before += a* np.sin(2 * np.pi * f * np.sqrt(time))
 
-        amplitude_after = butter_bandpass_filter(amplitude_before, lowcut, highcut, fs, order=6)
-        b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+        amplitude_after = butter_filter(amplitude_before, lowcut, highcut, fs, order=6,filter_type=self.filter_type)
+        b, a = get_filter(self.filter_type,fs,highcut,lowcut, order=order)
         w, h = freqz(b, a, worN=2000)
         repsonse_fequency=(fs * 0.5 / np.pi) * w
         response_gain=abs(h)
@@ -98,13 +136,16 @@ class Gui:
 
         self.filter_type_window.show()
     def accepted_new_filter_type(self):
-
+        # lowpass', 'highpass', 'bandpass', 'bandstop'
+        types={"dolnoprzepustowy":'lowpass',"górnoprzepustowy":'highpass',"środkowozaporowy":'bandstop',"środkowoprzepustowy":'bandpass'}
         highcut=self.filter_type_ui.filter_highcut.text()
         lowcut=self.filter_type_ui.filter_low_cut.text()
         highcut=highcut.replace(",",".")
         lowcut=lowcut.replace(",",".")
         self.highcut=float(highcut)
         self.lowcut=float(lowcut)
+        self.filter_type=types[self.filter_type_ui.filter_type.currentText()]
+
         self.filter_type_window.close()
         amplitude_before, amplitude_after, time, repsonse_fequency, response_gain = self.compute_plots()
         self.ui.repaint(amplitude_before, amplitude_after, time, repsonse_fequency, response_gain)
