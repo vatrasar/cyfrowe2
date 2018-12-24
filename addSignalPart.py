@@ -58,7 +58,9 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.label_4.setText(_translate("MainWindow", "wzór:"))
-        self.label.setText(_translate("MainWindow", " a * cos(2 * pi * f * time)"))
+        self.label.setText(_translate("MainWindow", " a * cos(2 * pi * f * time)\n "
+                                                    "Uwaga! Sygnał domyślny nie będzie brany pod uwagę.\n "
+                                                    "Sygnał będzie zbudowany tylko z dodanych składowych."))
         self.label_2.setText(_translate("MainWindow", "a"))
         self.label_3.setText(_translate("MainWindow", "f"))
 

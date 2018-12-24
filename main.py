@@ -142,13 +142,29 @@ class Gui:
         lowcut=self.filter_type_ui.filter_low_cut.text()
         highcut=highcut.replace(",",".")
         lowcut=lowcut.replace(",",".")
+        highcut=float(highcut)
+        lowcut=float(lowcut)
+        if (highcut <= lowcut):
+            self.alter()
+            return
         self.highcut=float(highcut)
         self.lowcut=float(lowcut)
+
+
         self.filter_type=types[self.filter_type_ui.filter_type.currentText()]
 
         self.filter_type_window.close()
         amplitude_before, amplitude_after, time, repsonse_fequency, response_gain = self.compute_plots()
         self.ui.repaint(amplitude_before, amplitude_after, time, repsonse_fequency, response_gain)
+
+    def alter(self):
+        dialog=QDialog()
+        ok_button=QLabel("Błędne dane.",dialog)
+        # ok_button.move(80,50)
+        dialog.resize(200,80)
+        dialog.setWindowModality(QtCore.Qt.ApplicationModal)
+        dialog.setWindowTitle("Błąd")
+        dialog.exec_()
 
     def rejected_new_filter_type(self):
         self.filter_type_window.close()

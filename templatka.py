@@ -69,20 +69,27 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.menuEdycja.setTitle(_translate("MainWindow", "Edycja"))
+        self.menuEdycja.setTitle(_translate("MainWindow", "Edycja filtru"))
         self.menu_sygnal.setTitle(_translate("MainWindow", "Sygnał"))
-        self.actionzmie_order.setText(_translate("MainWindow", "zmień rząd filtru"))
+        self.actionzmie_order.setText(_translate("MainWindow", "Rząd filtru"))
         self.add_signal_part.setText(_translate("MainWindow", "dodaj składową sygnału"))
         self.default_signal.setText(_translate("MainWindow", "sygnał domyślny"))
-        self.filter_type.setText(_translate("MainWindow", "Przepustowośc"))
+        self.filter_type.setText(_translate("MainWindow", "Przepustowość"))
 
 
 
 
     def make_plots(self,amplitude_before,amplitude_after,time,repsonse_fequency,response_gain):
-        self.plot = pg.PlotWidget(y=amplitude_before, x=time)
-        self.plot2 = pg.PlotWidget(y=amplitude_after, x=time)
-        self.plot3=pg.PlotWidget(y=response_gain, x=repsonse_fequency)
+        self.plot = pg.PlotWidget(y=amplitude_before, x=time,title="sygnał wejsciowy")
+        self.plot2 = pg.PlotWidget(y=amplitude_after, x=time,title="sygnał po filtracji")
+        self.plot3=pg.PlotWidget(y=response_gain, x=repsonse_fequency,title="Reakcja na częstotliwość")
+        self.plot.setLabel('bottom', "Czas", units='s')
+        self.plot.setLabel('left', "Amplituda")
+        self.plot2.setLabel('bottom', "Czas", units='s')
+        self.plot2.setLabel('left', "Amplituda")
+        self.plot3.setLabel('bottom', "Częstotliwość", units='Hz')
+        self.plot3.setLabel('left', "Waga")
+
     def repaint(self,amplitude_before, amplitude_after, time, repsonse_fequency, response_gain):
         self.plot.close()
         self.plot2.close()
