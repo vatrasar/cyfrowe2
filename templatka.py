@@ -44,8 +44,8 @@ class Ui_MainWindow(object):
         self.default_signal = QtWidgets.QAction(MainWindow)
         self.default_signal.setObjectName("default_signal")
 
-        self.rodzaj_filtru = QtWidgets.QAction(MainWindow)
-        self.default_signal.setObjectName("default_signal")
+        self.filter_type = QtWidgets.QAction(MainWindow)
+        self.filter_type.setObjectName("filter_type")
 
         self.add_signal_part = QtWidgets.QAction(MainWindow)
         self.add_signal_part.setObjectName("signal_part")
@@ -54,6 +54,7 @@ class Ui_MainWindow(object):
 
 
         self.menuEdycja.addAction(self.actionzmie_order)
+        self.menuEdycja.addAction(self.filter_type)
         self.menu_sygnal.addAction(self.add_signal_part)
         self.menu_sygnal.addAction(self.default_signal)
         self.menubar.addAction(self.menuEdycja.menuAction())
@@ -73,6 +74,7 @@ class Ui_MainWindow(object):
         self.actionzmie_order.setText(_translate("MainWindow", "zmień rząd filtru"))
         self.add_signal_part.setText(_translate("MainWindow", "dodaj składową sygnału"))
         self.default_signal.setText(_translate("MainWindow", "sygnał domyślny"))
+        self.filter_type.setText(_translate("MainWindow", "Przepustowośc"))
 
 
 

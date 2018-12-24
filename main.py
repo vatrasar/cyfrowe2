@@ -7,7 +7,7 @@ from scipy.signal import butter, lfilter
 import numpy as np
 import addSignalPart
 import new_order
-
+import filter_type
 
 def butter_bandpass(lowcut, highcut, fs, order=5):
     w = 0.5 * fs  # Normalize the frequency
@@ -25,20 +25,22 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
 class Gui:
     def __init__(self,window):
         self.order = 6
+        self.lowcut=500.0
+        self.highcut=1800.0
+        self.filter_type = 'band'  # lowpass', 'highpass', 'bandpass', 'bandstop'
         self.signal_parts = list()
         amplitude_before,amplitude_after,time,repsonse_fequency,response_gain=self.compute_plots()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(window,amplitude_before,amplitude_after,time,repsonse_fequency,response_gain)
         self.add_actions()
-        self.filter_type='band' #lowpass', 'highpass', 'bandpass', 'bandstop'
 
 
     def compute_plots(self):
         # Sample rate and desired cutoff frequencies (in Hz).
         fs = 5000.0
         T = 0.05
-        lowcut = 500.0
-        highcut = 1800.0
+        lowcut = self.lowcut
+        highcut = self.highcut
         nsamples = T * fs
         order=self.order
         time = np.linspace(0, T, nsamples, endpoint=False)
@@ -85,6 +87,30 @@ class Gui:
         self.ui.add_signal_part.triggered.connect(self.open_add_signal_window)
         self.ui.default_signal.triggered.connect(self.restore_default_signal)
         self.ui.actionzmie_order.triggered.connect(self.change_order)
+        self.ui.filter_type.triggered.connect(self.open_filter_type_window)
+
+    def open_filter_type_window(self):
+        self.filter_type_window = QtWidgets.QMainWindow()
+        self.filter_type_ui = filter_type.Ui_MainWindow()
+        self.filter_type_ui.setupUi(self.filter_type_window)
+        self.filter_type_ui.button_dialog.accepted.connect(self.accepted_new_filter_type)
+        self.filter_type_ui.button_dialog.rejected.connect(self.rejected_new_filter_type)
+
+        self.filter_type_window.show()
+    def accepted_new_filter_type(self):
+
+        highcut=self.filter_type_ui.filter_highcut.text()
+        lowcut=self.filter_type_ui.filter_low_cut.text()
+        highcut=highcut.replace(",",".")
+        lowcut=lowcut.replace(",",".")
+        self.highcut=float(highcut)
+        self.lowcut=float(lowcut)
+        self.filter_type_window.close()
+        amplitude_before, amplitude_after, time, repsonse_fequency, response_gain = self.compute_plots()
+        self.ui.repaint(amplitude_before, amplitude_after, time, repsonse_fequency, response_gain)
+
+    def rejected_new_filter_type(self):
+        self.filter_type_window.close()
     def change_order(self):
         self.change_order_window = QtWidgets.QMainWindow()
         self.change_order_ui = new_order.Ui_MainWindow()
