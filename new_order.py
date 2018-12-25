@@ -37,6 +37,6 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Rząd"))
         self.label_order.setText(_translate("MainWindow", "nowa wartośc rzędu"))
 

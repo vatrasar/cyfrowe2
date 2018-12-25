@@ -104,9 +104,9 @@ class Gui:
             f = signal_part[1]
             if index==0 and self.new_signal==True:
 
-                amplitude_before = a * np.sin(2 * np.pi * f* np.sqrt(time))
+                amplitude_before = a * np.sin(2 * np.pi * f*time)
             else:
-                amplitude_before += a* np.sin(2 * np.pi * f * np.sqrt(time))
+                amplitude_before += a* np.sin(2 * np.pi * f * time)
 
         amplitude_after = butter_filter(amplitude_before, lowcut, highcut, fs, order=6,filter_type=self.filter_type)
         b, a = get_filter(self.filter_type,fs,highcut,lowcut, order=order)

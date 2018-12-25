@@ -72,7 +72,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Program Edukacyjny"))
         self.menuEdycja.setTitle(_translate("MainWindow", "Edycja filtru"))
         self.menu_sygnal.setTitle(_translate("MainWindow", "Sygnał"))
         self.actionzmie_order.setText(_translate("MainWindow", "Rząd filtru"))

@@ -56,11 +56,9 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Nowa składowa"))
         self.label_4.setText(_translate("MainWindow", "wzór:"))
-        self.label.setText(_translate("MainWindow", " a * cos(2 * pi * f * time)\n "
-                                                    "Uwaga! Sygnał domyślny nie będzie brany pod uwagę.\n "
-                                                    "Sygnał będzie zbudowany tylko z dodanych składowych."))
+        self.label.setText(_translate("MainWindow", " a * sin(2 * pi * f * time)"))
         self.label_2.setText(_translate("MainWindow", "a"))
         self.label_3.setText(_translate("MainWindow", "f"))
 

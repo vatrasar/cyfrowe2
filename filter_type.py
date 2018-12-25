@@ -47,7 +47,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Przepustowość"))
         self.label.setText(_translate("MainWindow", "przepustowość"))
         self.filter_type.setItemText(0, _translate("MainWindow", "środkowoprzepustowy"))
         self.filter_type.setItemText(1, _translate("MainWindow", "górnoprzepustowy"))
