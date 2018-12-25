@@ -136,6 +136,7 @@ class Gui:
         self.ui.filter_type.triggered.connect(self.open_filter_type_window)
         self.ui.new_signal.triggered.connect(self.set_new_signal)
 
+
     def set_new_signal(self):
         self.new_signal=True
         amplitude_before, amplitude_after, time, repsonse_fequency, response_gain = self.compute_plots()
@@ -147,7 +148,21 @@ class Gui:
         self.filter_type_ui.button_dialog.accepted.connect(self.accepted_new_filter_type)
         self.filter_type_ui.button_dialog.rejected.connect(self.rejected_new_filter_type)
 
+        self.filter_type_ui.filter_type.currentIndexChanged.connect(self.index_changed)
         self.filter_type_window.show()
+
+
+    def index_changed(self):
+        if self.filter_type_ui.filter_type.currentText()=="dolnoprzepustowy":
+            self.filter_type_ui.filter_low_cut.setDisabled(True)
+            self.filter_type_ui.filter_highcut.setDisabled(False)
+        elif self.filter_type_ui.filter_type.currentText()=="górnoprzepustowy":
+            self.filter_type_ui.filter_highcut.setDisabled(True)
+            self.filter_type_ui.filter_low_cut.setDisabled(False)
+        else:
+            self.filter_type_ui.filter_low_cut.setDisabled(False)
+            self.filter_type_ui.filter_highcut.setDisabled(False)
+
     def accepted_new_filter_type(self):
         # lowpass', 'highpass', 'bandpass', 'bandstop'
         types={"dolnoprzepustowy":'lowpass',"górnoprzepustowy":'highpass',"środkowozaporowy":'bandstop',"środkowoprzepustowy":'bandpass'}
@@ -157,7 +172,8 @@ class Gui:
         lowcut=lowcut.replace(",",".")
         highcut=float(highcut)
         lowcut=float(lowcut)
-        if (highcut <= lowcut):
+        new_type=types[self.filter_type_ui.filter_type.currentText()]
+        if (highcut <= lowcut and new_type!='lowpass' and new_type!='highpass'):
             self.alter()
             return
         self.highcut=float(highcut)

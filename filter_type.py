@@ -49,10 +49,10 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.label.setText(_translate("MainWindow", "przepustowość"))
-        self.filter_type.setItemText(0, _translate("MainWindow", "dolnoprzepustowy"))
+        self.filter_type.setItemText(0, _translate("MainWindow", "środkowoprzepustowy"))
         self.filter_type.setItemText(1, _translate("MainWindow", "górnoprzepustowy"))
-        self.filter_type.setItemText(2, _translate("MainWindow", "środkowozaporowy"))
-        self.filter_type.setItemText(3, _translate("MainWindow", "środkowoprzepustowy"))
+        self.filter_type.setItemText(2, _translate("MainWindow", "dolnoprzepustowy"))
+        self.filter_type.setItemText(3, _translate("MainWindow", "środkowozaporowy"))
         self.label_2.setText(_translate("MainWindow", "lewy kraniec przedziału"))
         self.label_3.setText(_translate("MainWindow", "prawy kraniec przedziału"))
 
