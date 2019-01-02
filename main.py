@@ -139,6 +139,7 @@ class Gui:
 
     def set_new_signal(self):
         self.new_signal=True
+        self.signal_parts=list()
         amplitude_before, amplitude_after, time, repsonse_fequency, response_gain = self.compute_plots()
         self.ui.repaint(amplitude_before, amplitude_after, time, repsonse_fequency, response_gain)
     def open_filter_type_window(self):
