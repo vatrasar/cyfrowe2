@@ -2,39 +2,28 @@ from templatka import Ui_MainWindow
 from PyQt5 import QtWidgets,QtCore
 import sys
 from PyQt5.QtWidgets import QApplication,QDialog,QLabel
-from scipy.signal import freqz
-from scipy.signal import butter, lfilter
+from scipy.signal import freqz, sigtools
+
 from scipy import signal
 import numpy as np
 import addSignalPart
 import new_order
 import filter_type
-
 import numpy
 import capacity_filters
 
 
 
+def compute_butterworth(order):
 
-
-def buttap(N):
-    """Return (z,p,k) for analog prototype of Nth-order Butterworth filter.
-
-    The filter will have an angular (e.g. rad/s) cutoff frequency of 1.
-
-    See Also
-    --------
-    butter : Filter design function using this prototype
-
-    """
-    if abs(int(N)) != N:
+    if abs(int(order)) != order:
         raise ValueError("Filter order must be a nonnegative integer")
-    z = numpy.array([])
-    m = numpy.arange(-N+1, N, 2)
-    # Middle value is 0 to ensure an exactly real pole
-    p = -numpy.exp(1j * numpy.pi * m / (2 * N))
-    k = 1
-    return z, p, k
+    z = numpy.array([]) #complex number
+    m = numpy.arange(-order+1, order, 2)
+
+    p = -numpy.exp(1j * numpy.pi * m / (2 * order))
+
+    return z, p
 
 def butter_test(order,range,capacity):
 
@@ -44,44 +33,35 @@ def butter_test(order,range,capacity):
         'lowpass': 'lowpass',
         'highpass': 'highpass',
     }
-    range = numpy.numeric.asarray(range)
+    range = numpy.core.numeric.asarray(range)
 
     btype = band_dict[capacity]
-    z, p, k = buttap(order)
-    # Pre-warp frequencies for digital filter design
+    z, p= compute_butterworth(order)
 
-    if numpy.any(range < 0) or numpy.any(range > 1):
-        raise ValueError("Digital filter critical frequencies "
-                         "must be 0 <= Wn <= 1")
+
     fs = 2.0
     warped = 2 * fs * numpy.tan(numpy.pi * range / fs)
 
 
-    # transform to lowpass, bandpass, highpass, or bandstop
+
     if btype in ('lowpass', 'highpass'):
 
         if btype == 'lowpass':
-            z, p, k = capacity_filters.zpklp2lp(z, p, k, wo=warped)
+            z, p, k = capacity_filters._zpklp2lp(z, p, 1, wo=warped)
         elif btype == 'highpass':
-            z, p, k = capacity_filters._zpklp2hp(z, p, k, wo=warped)
+            z, p, k = capacity_filters._zpklp2hp(z, p, 1, wo=warped)
     elif btype in ('bandpass', 'bandstop'):
-        try:
-            bw = warped[1] - warped[0]
-            wo = numpy.sqrt(warped[0] * warped[1])
-        except IndexError:
-            raise ValueError('Wn must specify start and stop frequencies')
+
+        bw = warped[1] - warped[0]
+        wo = numpy.sqrt(warped[0] * warped[1])
 
         if btype == 'bandpass':
-            z, p, k = capacity_filters._zpklp2bp(z, p, k, wo=wo, bw=bw)
+            z, p, k = capacity_filters._zpklp2bp(z, p, 1, wo=wo, bw=bw)
         elif btype == 'bandstop':
-            z, p, k = capacity_filters._zpklp2bs(z, p, k, wo=wo, bw=bw)
-    else:
-        raise NotImplementedError("'%s' not implemented in iirfilter." % btype)
+            z, p, k = capacity_filters._zpklp2bs(z, p, 1, wo=wo, bw=bw)
 
 
-    z, p, k = capacity_filters._zpkbilinear(z, p, k, fs=fs)
-
-
+    z, p, k = capacity_filters._zpkbilinear(z, p, 1, fs=fs)
     return signal.zpk2tf(z, p, k)
 
 
@@ -89,7 +69,7 @@ def butter_bandpass(lowcut, highcut, fs, order=5):
     w = 0.5 * fs  # Normalize the frequency
     low = lowcut / w
     high = highcut / w
-    b, a = butter(order, [low, high], btype='bandpass')
+    b, a = butter_test(order, [low, high], capacity='bandpass')
     return b, a
 
 
@@ -97,14 +77,14 @@ def butter_lowpass(highcut, fs, order):
     w = 0.5 * fs  # Normalize the frequency
 
     high = highcut / w
-    b, a = butter(order, high, btype='lowpass')
+    b, a = butter_test(order, high, capacity='lowpass')
     return b, a
 
 
 def butter_highpass(lowcut, fs, order):
     w = 0.5 * fs  # Normalize the frequency
     low = lowcut / w
-    b, a = butter(order, low, btype='highpass')
+    b, a = butter_test(order, low, capacity='highpass')
     return b, a
 
 
@@ -112,9 +92,75 @@ def butter_bandstop(lowcut, highcut, fs, order):
     w = 0.5 * fs  # Normalize the frequency
     low = lowcut / w
     high = highcut / w
-    b, a = butter(order, [low, high], btype='bandstop')
+    b, a = butter_test(order, [low, high], capacity='bandstop')
     return b, a
+def lfilter(b, a, x, axis=-1, zi=None):
 
+    a = np.atleast_1d(a)
+    if len(a) == 1:
+        a = np.asarray(a)
+        if b.ndim != 1 and a.ndim != 1:
+            raise ValueError('object of too small depth for desired array')
+        x = np.asarray(x)
+        inputs = [b, a, x]
+        if zi is not None:
+            # _linear_filter does not broadcast zi, but does do expansion of
+            # singleton dims.
+            zi = np.asarray(zi)
+            if zi.ndim != x.ndim:
+                raise ValueError('object of too small depth for desired array')
+            expected_shape = list(x.shape)
+            expected_shape[axis] = b.shape[0] - 1
+            expected_shape = tuple(expected_shape)
+            # check the trivial case where zi is the right shape first
+            if zi.shape != expected_shape:
+                strides = zi.ndim * [None]
+                if axis < 0:
+                    axis += zi.ndim
+                for k in range(zi.ndim):
+                    if k == axis and zi.shape[k] == expected_shape[k]:
+                        strides[k] = zi.strides[k]
+                    elif k != axis and zi.shape[k] == expected_shape[k]:
+                        strides[k] = zi.strides[k]
+                    elif k != axis and zi.shape[k] == 1:
+                        strides[k] = 0
+                    else:
+                        raise ValueError('Unexpected shape for zi: expected '
+                                         '%s, found %s.' %
+                                         (expected_shape, zi.shape))
+                zi = np.lib.stride_tricks.as_strided(zi, expected_shape,
+                                                     strides)
+            inputs.append(zi)
+        dtype = np.result_type(*inputs)
+
+        if dtype.char not in 'fdgFDGO':
+            raise NotImplementedError("input type '%s' not supported" % dtype)
+
+        b = np.array(b, dtype=dtype)
+        a = np.array(a, dtype=dtype, copy=False)
+        b /= a[0]
+        x = np.array(x, dtype=dtype, copy=False)
+
+        out_full = np.apply_along_axis(lambda y: np.convolve(b, y), axis, x)
+        ind = out_full.ndim * [slice(None)]
+        if zi is not None:
+            ind[axis] = slice(zi.shape[axis])
+            out_full[ind] += zi
+
+        ind[axis] = slice(out_full.shape[axis] - len(b) + 1)
+        out = out_full[ind]
+
+        if zi is None:
+            return out
+        else:
+            ind[axis] = slice(out_full.shape[axis] - len(b) + 1, None)
+            zf = out_full[ind]
+            return out, zf
+    else:
+        if zi is None:
+            return sigtools._linear_filter(b, a, x, axis)
+        else:
+            return sigtools._linear_filter(b, a, x, axis, zi)
 
 def butter_filter(data, lowcut, highcut, fs, order=5,filter_type='band'):
     b, a = get_filter(filter_type, fs, highcut, lowcut, order)
