@@ -9,7 +9,32 @@ def get_degree(z, p):
     return degree
 
 def _zpklp2lp(z, p, k, wo=1.0):
+    """
+ Transform a lowpass filter prototype to a different frequency.
+ z : array_like
+        Zeros of the analog IIR filter transfer function.
+    p : array_like
+        Poles of the analog IIR filter transfer function.
+    k : float
+        System gain of the analog IIR filter transfer function.
+    wo : float
+        Desired cutoff, as angular frequency (e.g. rad/s).
+        Defaults to no change.
 
+    Returns
+    -------
+    z : ndarray
+        Zeros of the transformed low-pass filter transfer function.
+    p : ndarray
+        Poles of the transformed low-pass filter transfer function.
+    k : float
+        System gain of the transformed low-pass filter.
+    :param z:Zeros of the analog IIR filter transfer function.
+    :param p: Poles of the analog IIR filter transfer function.
+    :param k: System gain of the analog IIR filter transfer function.
+    :param wo: Desired cutoff, as angular frequency (e.g. rad/s).
+    :return:
+    """
     z = atleast_1d(z)
     p = atleast_1d(p)
     wo = float(wo)
@@ -24,7 +49,15 @@ def _zpklp2lp(z, p, k, wo=1.0):
 
 
 def _zpklp2lp(z, p, k, wo=1.0):
+    """
+Transform a lowpass filter prototype to a different frequency.
 
+    :param z: Zeros of the analog IIR filter transfer function.
+    :param p: Poles of the analog IIR filter transfer function.
+    :param k: System gain of the analog IIR filter transfer function
+    :param wo: Desired cutoff, as angular frequency (e.g. rad/s).
+    :return:
+    """
     z = atleast_1d(z)
     p = atleast_1d(p)
     wo = float(wo)
@@ -41,7 +74,14 @@ def _zpklp2lp(z, p, k, wo=1.0):
     return z_lp, p_lp, k_lp
 
 def _zpklp2hp(z, p, k, wo=1.0):
-
+    """
+Transform a lowpass filter prototype to a highpass filter.
+    :param z:
+    :param p:
+    :param k:
+    :param wo:
+    :return:
+    """
     z = atleast_1d(z)
     p = atleast_1d(p)
     wo = float(wo)
@@ -62,7 +102,14 @@ def _zpklp2hp(z, p, k, wo=1.0):
 
 
 def _zpklp2lp(z, p, k, wo=1.0):
-
+    """
+Transform a lowpass filter prototype to a different frequency.
+    :param z:
+    :param p:
+    :param k:
+    :param wo:
+    :return:
+    """
     z = atleast_1d(z)
     p = atleast_1d(p)
     wo = float(wo)
@@ -80,7 +127,14 @@ def _zpklp2lp(z, p, k, wo=1.0):
 
 
 def _zpklp2hp(z, p, k, wo=1.0):
-
+    """
+Transform a lowpass filter prototype to a highpass filter.
+    :param z:
+    :param p:
+    :param k:
+    :param wo:
+    :return:
+    """
     z = atleast_1d(z)
     p = atleast_1d(p)
     wo = float(wo)
@@ -101,7 +155,15 @@ def _zpklp2hp(z, p, k, wo=1.0):
 
 
 def _zpklp2bp(z, p, k, wo=1.0, bw=1.0):
-
+    """
+Transform a lowpass filter prototype to a bandpass filter.
+    :param z:
+    :param p:
+    :param k:
+    :param wo:
+    :param bw:
+    :return:
+    """
     z = atleast_1d(z)
     p = atleast_1d(p)
     wo = float(wo)
@@ -133,7 +195,15 @@ def _zpklp2bp(z, p, k, wo=1.0, bw=1.0):
 
 
 def _zpklp2bs(z, p, k, wo=1.0, bw=1.0):
-
+    """
+Transform a lowpass filter prototype to a bandstop filter.
+    :param z:
+    :param p:
+    :param k:
+    :param wo:
+    :param bw:
+    :return:
+    """
     z = numpy.atleast_1d(z)
     p = numpy.atleast_1d(p)
     wo = float(wo)
@@ -164,7 +234,14 @@ def _zpklp2bs(z, p, k, wo=1.0, bw=1.0):
     return z_bs, p_bs, k_bs
 
 def _zpkbilinear(z, p, k, fs):
-
+    """
+Return a digital filter from an analog one using a bilinear transform.
+    :param z:
+    :param p:
+    :param k:
+    :param fs:
+    :return:
+    """
     z = atleast_1d(z)
     p = atleast_1d(p)
     degree = get_degree(z, p)

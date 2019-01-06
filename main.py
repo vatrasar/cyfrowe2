@@ -27,15 +27,10 @@ def compute_butterworth(order):
 
 def butter_test(order,range,capacity):
 
-    band_dict = {
-        'bandpass': 'bandpass',
-        'bandstop': 'bandstop',
-        'lowpass': 'lowpass',
-        'highpass': 'highpass',
-    }
+
     range = numpy.core.numeric.asarray(range)
 
-    btype = band_dict[capacity]
+
     z, p= compute_butterworth(order)
 
 
@@ -44,20 +39,20 @@ def butter_test(order,range,capacity):
 
 
 
-    if btype in ('lowpass', 'highpass'):
+    if capacity in ('lowpass', 'highpass'):
 
-        if btype == 'lowpass':
+        if capacity == 'lowpass':
             z, p, k = capacity_filters._zpklp2lp(z, p, 1, wo=warped)
-        elif btype == 'highpass':
+        elif capacity == 'highpass':
             z, p, k = capacity_filters._zpklp2hp(z, p, 1, wo=warped)
-    elif btype in ('bandpass', 'bandstop'):
+    elif capacity in ('bandpass', 'bandstop'):
 
         bw = warped[1] - warped[0]
         wo = numpy.sqrt(warped[0] * warped[1])
 
-        if btype == 'bandpass':
+        if capacity == 'bandpass':
             z, p, k = capacity_filters._zpklp2bp(z, p, 1, wo=wo, bw=bw)
-        elif btype == 'bandstop':
+        elif capacity == 'bandstop':
             z, p, k = capacity_filters._zpklp2bs(z, p, 1, wo=wo, bw=bw)
 
 
@@ -88,84 +83,20 @@ def butter_highpass(lowcut, fs, order):
     return b, a
 
 
+
 def butter_bandstop(lowcut, highcut, fs, order):
     w = 0.5 * fs  # Normalize the frequency
     low = lowcut / w
     high = highcut / w
     b, a = butter_test(order, [low, high], capacity='bandstop')
     return b, a
-def lfilter(b, a, x, axis=-1, zi=None):
 
-    a = np.atleast_1d(a)
-    if len(a) == 1:
-        a = np.asarray(a)
-        if b.ndim != 1 and a.ndim != 1:
-            raise ValueError('object of too small depth for desired array')
-        x = np.asarray(x)
-        inputs = [b, a, x]
-        if zi is not None:
-            # _linear_filter does not broadcast zi, but does do expansion of
-            # singleton dims.
-            zi = np.asarray(zi)
-            if zi.ndim != x.ndim:
-                raise ValueError('object of too small depth for desired array')
-            expected_shape = list(x.shape)
-            expected_shape[axis] = b.shape[0] - 1
-            expected_shape = tuple(expected_shape)
-            # check the trivial case where zi is the right shape first
-            if zi.shape != expected_shape:
-                strides = zi.ndim * [None]
-                if axis < 0:
-                    axis += zi.ndim
-                for k in range(zi.ndim):
-                    if k == axis and zi.shape[k] == expected_shape[k]:
-                        strides[k] = zi.strides[k]
-                    elif k != axis and zi.shape[k] == expected_shape[k]:
-                        strides[k] = zi.strides[k]
-                    elif k != axis and zi.shape[k] == 1:
-                        strides[k] = 0
-                    else:
-                        raise ValueError('Unexpected shape for zi: expected '
-                                         '%s, found %s.' %
-                                         (expected_shape, zi.shape))
-                zi = np.lib.stride_tricks.as_strided(zi, expected_shape,
-                                                     strides)
-            inputs.append(zi)
-        dtype = np.result_type(*inputs)
 
-        if dtype.char not in 'fdgFDGO':
-            raise NotImplementedError("input type '%s' not supported" % dtype)
-
-        b = np.array(b, dtype=dtype)
-        a = np.array(a, dtype=dtype, copy=False)
-        b /= a[0]
-        x = np.array(x, dtype=dtype, copy=False)
-
-        out_full = np.apply_along_axis(lambda y: np.convolve(b, y), axis, x)
-        ind = out_full.ndim * [slice(None)]
-        if zi is not None:
-            ind[axis] = slice(zi.shape[axis])
-            out_full[ind] += zi
-
-        ind[axis] = slice(out_full.shape[axis] - len(b) + 1)
-        out = out_full[ind]
-
-        if zi is None:
-            return out
-        else:
-            ind[axis] = slice(out_full.shape[axis] - len(b) + 1, None)
-            zf = out_full[ind]
-            return out, zf
-    else:
-        if zi is None:
-            return sigtools._linear_filter(b, a, x, axis)
-        else:
-            return sigtools._linear_filter(b, a, x, axis, zi)
 
 def butter_filter(data, lowcut, highcut, fs, order=5,filter_type='band'):
     b, a = get_filter(filter_type, fs, highcut, lowcut, order)
 
-    y = lfilter(b, a, data)
+    y = signal.lfilter(b, a, data)
     return y
 
 
@@ -197,7 +128,7 @@ class Gui:
 
 
     def compute_plots(self):
-        # Sample rate and desired cutoff frequencies (in Hz).
+
         fs = 5000.0
         T = 0.05
         lowcut = self.lowcut
@@ -213,7 +144,7 @@ class Gui:
             amplitude_before += 0.02 * np.cos(2 * np.pi * 600.0 * time + .11)
             amplitude_before += 0.03 * np.cos(2 * np.pi * 2000 * time)
 
-        if len(self.signal_parts)==0 and self.new_signal==True:
+        if len(self.signal_parts)==0 and self.new_signal==True:#empty signal
             b, a = get_filter(self.filter_type, fs, highcut, lowcut, order=order)
             w, h = freqz(b, a, worN=2000)
             repsonse_fequency = (fs * 0.5 / np.pi) * w
@@ -221,7 +152,8 @@ class Gui:
             amplitude_after=time*0
             amplitude_before=time*0
             return amplitude_before, amplitude_after, time, repsonse_fequency, response_gain
-        for index,signal_part in enumerate(self.signal_parts):
+
+        for index,signal_part in enumerate(self.signal_parts): #make new signal from components
             a = signal_part[0]
             f = signal_part[1]
             if index==0 and self.new_signal==True:
@@ -237,7 +169,11 @@ class Gui:
         response_gain=abs(h)
 
         return amplitude_before,amplitude_after,time,repsonse_fequency,response_gain
+
     def accepted_new_signal_part(self):
+        """
+        add new signal part to signal parts and refresh plots
+        """
         a=self.add_signal_ui.signal_a.text()
         f=self.add_signal_ui.signal_f.text()
         a=a.replace(",",".")
@@ -250,8 +186,15 @@ class Gui:
         self.ui.repaint(amplitude_before, amplitude_after, time, repsonse_fequency, response_gain)
 
     def rejected_new_signal_part(self):
+        """
+        new signal isn't add
+        """
         self.add_signal_window.close()
+
     def add_actions(self):
+        """
+        add actioons to menubar
+        """
         self.ui.add_signal_part.triggered.connect(self.open_add_signal_window)
         self.ui.default_signal.triggered.connect(self.restore_default_signal)
         self.ui.actionzmie_order.triggered.connect(self.change_order)
@@ -260,10 +203,14 @@ class Gui:
 
 
     def set_new_signal(self):
+        """
+        reset signal
+        """
         self.new_signal=True
         self.signal_parts=list()
         amplitude_before, amplitude_after, time, repsonse_fequency, response_gain = self.compute_plots()
         self.ui.repaint(amplitude_before, amplitude_after, time, repsonse_fequency, response_gain)
+
     def open_filter_type_window(self):
         self.filter_type_window = QtWidgets.QMainWindow()
         self.filter_type_ui = filter_type.Ui_MainWindow()
@@ -276,6 +223,9 @@ class Gui:
 
 
     def index_changed(self):
+        """
+        set index in filter type
+        """
         if self.filter_type_ui.filter_type.currentText()=="dolnoprzepustowy":
             self.filter_type_ui.filter_low_cut.setDisabled(True)
             self.filter_type_ui.filter_highcut.setDisabled(False)
@@ -320,6 +270,7 @@ class Gui:
 
     def rejected_new_filter_type(self):
         self.filter_type_window.close()
+
     def change_order(self):
         self.change_order_window = QtWidgets.QMainWindow()
         self.change_order_ui = new_order.Ui_MainWindow()
@@ -328,7 +279,11 @@ class Gui:
         self.change_order_ui.buttonBox.rejected.connect(self.rejected_new_order)
 
         self.change_order_window.show()
+
     def accepted_new_order(self):
+        """
+        set new order
+        """
         self.change_order_window.close()
         new_order=int(self.change_order_ui.new_order_num.text())
         self.order=new_order
@@ -336,6 +291,7 @@ class Gui:
         self.ui.repaint(amplitude_before, amplitude_after, time, repsonse_fequency, response_gain)
     def rejected_new_order(self):
         self.add_signal_window.close()
+
     def open_add_signal_window(self):
         self.add_signal_window=QtWidgets.QMainWindow()
         self.add_signal_ui=addSignalPart.Ui_MainWindow()
@@ -344,7 +300,11 @@ class Gui:
         self.add_signal_ui.button_dialog.rejected.connect(self.rejected_new_signal_part)
 
         self.add_signal_window.show()
+
     def restore_default_signal(self):
+        """
+        set default signal
+        """
         self.signal_parts.clear()
         self.new_signal=False
         amplitude_before, amplitude_after, time, repsonse_fequency, response_gain = self.compute_plots()
